@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using Microsoft.Office.Interop.Excel;
 
 namespace LearnDynamic
 {
@@ -7,11 +10,14 @@ namespace LearnDynamic
     {
         static void Main(string[] args)
         {
-            Demo1();
-            Demo2();
+            //Demo1();
+            //Demo2();
             //Demo3();
-            Demo4();
-            Console.Read();
+            //Demo4();
+            DemoExcelWithCasting();
+            DemoExcelWithConversionNoCasting();
+            DemoExcelPurelyDynamic();
+            //Console.Read();
         }
 
         public static void Demo1()
@@ -63,15 +69,59 @@ namespace LearnDynamic
             string uStr = str.ToUpper(); // Statically types
 
             var vStr = "var hello";           // Strongly typed
-            string vUpperStr = str.ToUpper(); // Statically typed
+            string vUpperStr = vStr.ToUpper(); // Statically typed
 
             object oStr = "object hello";   // Weakly typed
             // No intellisense and doesn't compile
-            string oUpperStr = oStr.ToUpper(); // Statically typed
+            //string oUpperStr = oStr.ToUpper(); // Statically typed
 
             dynamic dStr = "dynamic hello"; // Weakly typed
             // No intellisense but compiler is happy
             string dUpperString = dStr.ToUpper(); // Dynamically typed
+        }
+
+        //With the primary interop assembly set to embed the required types into your own
+        //binary, all of these examples become dynamic. With the implicit conversion from
+        //dynamic to other types, you can remove all the casts, as shown in the following listing
+        public static void DemoExcelWithConversionNoCasting() {
+            var app = new Application { Visible = true };
+            app.Workbooks.Add();
+            Worksheet worksheet = app.ActiveSheet;
+            Range start = worksheet.Cells[1, 1];
+            Range end = worksheet.Cells[1, 20];
+            worksheet.Range[start, end].Value = Enumerable.Range(1, 20).ToArray();
+        }
+
+        public static void DemoExcelWithCasting()
+        {
+            var app = new Application { Visible = true };
+            app.Workbooks.Add();
+            Worksheet worksheet = (Worksheet) app.ActiveSheet;
+            Range start = (Range) worksheet.Cells[1, 1];
+            Range end = (Range) worksheet.Cells[1, 20];
+            //Range middle = worksheet.
+            worksheet.Range[start, end].Value = Enumerable.Range(1, 20).ToArray();
+        }
+
+        //Pros: 
+        //no need to work out which particular type you
+        //expect; you can just use the value, and as long as all the necessary operations are supported,
+        //you’re okay
+        //Cons:
+        //No intellisense
+        public static void DemoExcelPurelyDynamic()
+        {
+            var app = new Application { Visible = true };
+            app.Workbooks.Add();
+            dynamic worksheet = app.ActiveSheet;
+            dynamic start = worksheet.Cells[1, 1];
+            dynamic end = worksheet.Cells[1, 20];
+            //dynamic middle = worksheet.
+            worksheet.Range[start, end].Value = Enumerable.Range(1, 20).ToArray();
+        }
+
+        public static void IronPythonExample() { 
+            
         }
     }
 }
