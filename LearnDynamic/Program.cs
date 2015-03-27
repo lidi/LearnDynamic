@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Microsoft.Office.Interop.Excel;
+using IronPython.Hosting;
+using Microsoft.Scripting.Hosting;
+
 
 namespace LearnDynamic
 {
@@ -14,10 +17,11 @@ namespace LearnDynamic
             //Demo2();
             //Demo3();
             //Demo4();
-            DemoExcelWithCasting();
-            DemoExcelWithConversionNoCasting();
-            DemoExcelPurelyDynamic();
-            //Console.Read();
+            //DemoExcelWithCasting();
+            //DemoExcelWithConversionNoCasting();
+            //DemoExcelPurelyDynamic();
+            IronPythonExample();
+            Console.Read();
         }
 
         public static void Demo1()
@@ -120,8 +124,15 @@ namespace LearnDynamic
             worksheet.Range[start, end].Value = Enumerable.Range(1, 20).ToArray();
         }
 
-        public static void IronPythonExample() { 
-            
+        public static void IronPythonExample() {
+            var options = new Dictionary<string, object>();
+            options["Frames"] = true;
+            options["FullFrames"] = true;
+            ScriptEngine engine = Python.CreateEngine(options);
+            var paths = engine.GetSearchPaths();
+            paths.Add("C:/Users/lidi/Documents/Visual Studio 2013/Projects/IronPythonDemo/IronPythonDemo/env/Lib");
+            engine.SetSearchPaths(paths);
+            engine.ExecuteFile("GithubDemo.py");
         }
     }
 }
